@@ -46,6 +46,3 @@ npm run lint
 
 Set `NEXT_PUBLIC_SITE_URL=https://<your-domain>` in production so generated commands use the public
 origin even when the request is proxied.
-
-Component APIs come from the Astryx CLI, not memory: `npx astryx component <Name>`.
-# niksyskills
