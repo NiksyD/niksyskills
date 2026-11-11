@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# niksyskills
 
-## Getting Started
+A personal registry for agent skills. Every folder in `skills/` with a `SKILL.md` becomes a
+documentation page, a stable raw URL, and a one-line install command. Built with Next.js 16
+and [Astryx](https://astryx.atmeta.com).
 
-First, run the development server:
+## Add a skill
+
+1. Create `skills/<name>/SKILL.md` with `name` and `description` in the YAML frontmatter.
+2. Put any supporting files next to it (for example `references/`).
+3. Deploy. The site, `/skills.json`, `/llms.txt`, and the installer pick it up automatically.
+
+Optional frontmatter keys the site understands: `tags` (list), `collection` (string, overrides
+the auto-derived group), `capabilities` (list, overrides the badge heuristics: `read-only`,
+`uses-git`, `writes-files`, `runs-checks`).
+
+## Install a skill from the site
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+curl -fsSL https://<your-domain>/install.sh | bash -s -- git-commit-message
+curl -fsSL https://<your-domain>/install.sh | bash -s -- session-handoff --target codex --project
+curl -fsSL https://<your-domain>/install.sh | bash -s -- --list
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Install targets and their directories live in `lib/targets.ts`. Flags: `--target claude|codex|cursor|gemini|agents`,
+`--project` (install into the current repo), `--dir <path>`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Endpoints for agents
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Path | What it is |
+| --- | --- |
+| `/llms.txt` | Plain-text index with install instructions |
+| `/skills.json` | JSON index of every skill |
+| `/install.sh` | Bash installer |
+| `/skills/<name>/manifest.json` | Files and metadata for one skill |
+| `/skills/<name>/files.txt` | One relative path per line (used by the installer) |
+| `/skills/<name>/raw/<path>` | Raw file contents |
 
-## Learn More
+## Development
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run dev     # http://localhost:3000
+npm run build
+npm run lint
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Set `NEXT_PUBLIC_SITE_URL=https://<your-domain>` in production so generated commands use the public
+origin even when the request is proxied.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Component APIs come from the Astryx CLI, not memory: `npx astryx component <Name>`.
+# niksyskills
