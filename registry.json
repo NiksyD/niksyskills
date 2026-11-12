@@ -1,0 +1,44 @@
+{
+  "bundles": [
+    {
+      "id": "workflow",
+      "description": "Everyday habits: commit messages and carrying context between chats.",
+      "skills": ["git-commit-message", "session-handoff"]
+    },
+    {
+      "id": "prospect-standards",
+      "description": "Implement, migrate and review code against the Prospect Analyzer standards.",
+      "skills": ["prospect-standards-implement", "prospect-standards-migrate", "prospect-standards-review"]
+    },
+    {
+      "id": "web-app",
+      "description": "Full-stack web work: React, Next.js, TypeScript, Node, Tailwind, shadcn, accessibility, SEO and browser checks.",
+      "source": {
+        "name": "agentic-awesome-skills (aasb-web-app)",
+        "url": "https://github.com/sickn33/agentic-awesome-skills/tree/main/plugins/aasb-web-app",
+        "license": "MIT / CC BY 4.0"
+      },
+      "skills": [
+        "accessibility-compliance-accessibility-audit",
+        "browser-automation",
+        "build-ui",
+        "form-cro",
+        "frontend-api-integration-patterns",
+        "frontend-design",
+        "frontend-developer",
+        "javascript-pro",
+        "nextjs-app-router-patterns",
+        "nextjs-best-practices",
+        "nodejs-best-practices",
+        "react-best-practices",
+        "react-patterns",
+        "seo-audit",
+        "shadcn",
+        "tailwind-patterns",
+        "typescript-expert",
+        "ui-a11y",
+        "ui-states"
+      ]
+    }
+  ]
+}

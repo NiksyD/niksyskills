@@ -38,6 +38,18 @@ export function SkillDetail({skill}: {skill: Skill}) {
           ))}
         </VStack>
       </MetadataListItem>
+      <MetadataListItem label="Source">
+        {skill.source ? (
+          <VStack gap={0.5}>
+            <Link href={skill.source.url}>{skill.source.name}</Link>
+            <Text type="supporting" color="secondary">
+              Imported · {skill.source.license}
+            </Text>
+          </VStack>
+        ) : (
+          'Original'
+        )}
+      </MetadataListItem>
       <MetadataListItem label="Size">{formatBytes(skill.totalBytes)}</MetadataListItem>
       <MetadataListItem label="Updated">{formatDate(skill.updatedAt)}</MetadataListItem>
       {skill.tags.length > 0 ? (
@@ -47,6 +59,22 @@ export function SkillDetail({skill}: {skill: Skill}) {
               <Token key={t} label={t} size="sm" />
             ))}
           </HStack>
+        </MetadataListItem>
+      ) : null}
+      {skill.history.length > 0 ? (
+        <MetadataListItem label="History">
+          <VStack gap={1}>
+            {skill.history.slice(0, 5).map(c => (
+              <VStack key={c.hash} gap={0}>
+                <Text type="supporting" maxLines={2}>
+                  {c.subject}
+                </Text>
+                <Text type="supporting" color="secondary">
+                  {c.hash} · {formatDate(c.date)}
+                </Text>
+              </VStack>
+            ))}
+          </VStack>
         </MetadataListItem>
       ) : null}
       {extra.map(([key, value]) => (

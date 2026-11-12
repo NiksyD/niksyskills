@@ -76,6 +76,7 @@ export function Chrome({skills, children}: {skills: PaletteSkill[]; children: Re
           startContent={
             <>
               <TopNavItem label="Skills" href="/" isSelected={pathname === '/'} />
+              <TopNavItem label="Build" href="/build" isSelected={pathname === '/build'} />
               <TopNavItem label="For agents" href="/#agent-access" />
             </>
           }

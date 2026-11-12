@@ -1,6 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {execFileSync} from 'node:child_process';
 import matter from 'gray-matter';
+import {getPlacements, type Placement, type SkillSource} from '@/lib/registry';
 
 /** Server-only: reads the `skills/` folder. Never import from a client component. */
 
@@ -14,7 +16,10 @@ export interface SkillSummary {
   slug: string;
   name: string;
   description: string;
+  /** Bundle id from registry.json; "general" when the skill is not listed in any bundle. */
   collection: string;
+  /** Upstream of an imported skill, or null for your own. */
+  source: SkillSource | null;
   tags: string[];
   capabilities: string[];
   files: SkillFile[];
@@ -23,7 +28,16 @@ export interface SkillSummary {
   updatedAt: string;
 }
 
+export interface SkillCommit {
+  hash: string;
+  /** ISO date. */
+  date: string;
+  subject: string;
+}
+
 export interface Skill extends SkillSummary {
+  /** Recent commits touching this skill. Empty when the skill is untracked or git history is unavailable. */
+  history: SkillCommit[];
   /** SKILL.md body with frontmatter stripped. */
   body: string;
   /** Raw SKILL.md including frontmatter. */
@@ -83,26 +97,29 @@ function deriveCapabilities(body: string, explicit?: unknown): string[] {
   return caps.includes('read-only') ? caps.filter(c => c !== 'writes-files') : caps;
 }
 
-function deriveCollections(slugs: string[]): Map<string, string> {
-  // Longest hyphen-prefix shared by at least two skills becomes the collection.
-  const result = new Map<string, string>();
-  for (const slug of slugs) {
-    const parts = slug.split('-');
-    let best = '';
-    for (let k = parts.length - 1; k >= 1; k--) {
-      const prefix = parts.slice(0, k).join('-');
-      const shared = slugs.filter(s => s === prefix || s.startsWith(prefix + '-')).length;
-      if (shared >= 2) {
-        best = prefix;
-        break;
-      }
-    }
-    result.set(slug, best || 'general');
+/** Last commits for one skill folder. Never throws: shallow clones and untracked files give []. */
+function readHistory(slug: string): SkillCommit[] {
+  try {
+    const out = execFileSync(
+      'git',
+      ['log', '-n', '15', '--format=%h%x09%cI%x09%s', '--', `skills/${slug}`],
+      {cwd: process.cwd(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore']},
+    );
+    return out
+      .split('\n')
+      .filter(Boolean)
+      .map(line => {
+        const [hash, date, ...rest] = line.split('\t');
+        return {hash, date, subject: rest.join('\t')};
+      });
+  } catch {
+    return [];
   }
-  return result;
 }
 
-function readSkill(slug: string, collection: string): Skill | null {
+function readSkill(slug: string, placements: Map<string, Placement>): Skill | null {
+  const placement = placements.get(slug);
+  const collection = placement?.collection ?? 'general';
   const dir = path.join(SKILLS_DIR, slug);
   const skillFile = path.join(dir, 'SKILL.md');
   if (!fs.existsSync(skillFile)) return null;
@@ -113,16 +130,20 @@ function readSkill(slug: string, collection: string): Skill | null {
     unknown
   >;
   const files = walk(dir, dir);
+  const history = readHistory(slug);
   return {
+    history,
     slug,
     name: typeof name === 'string' && name ? name : slug,
     description: typeof description === 'string' ? description : '',
     collection: typeof fmCollection === 'string' ? fmCollection : collection,
+    source: placement?.source ?? null,
     tags: Array.isArray(tags) ? tags.map(String) : [],
     capabilities: deriveCapabilities(parsed.content, capabilities),
     files,
     totalBytes: files.reduce((n, f) => n + f.bytes, 0),
-    updatedAt: latestMtime(dir).toISOString(),
+    // Commit date is stable across checkouts; file mtimes are not. Fall back for untracked skills.
+    updatedAt: history[0]?.date ?? latestMtime(dir).toISOString(),
     body: parsed.content.trim(),
     raw,
     extraFrontmatter: rest,
@@ -140,22 +161,20 @@ export function listSkillSlugs(): string[] {
 }
 
 export function getAllSkills(): Skill[] {
-  const slugs = listSkillSlugs();
-  const collections = deriveCollections(slugs);
-  return slugs
-    .map(slug => readSkill(slug, collections.get(slug) ?? 'general'))
+  const placements = getPlacements();
+  return listSkillSlugs()
+    .map(slug => readSkill(slug, placements))
     .filter((s): s is Skill => s !== null);
 }
 
 export function getSkill(slug: string): Skill | null {
   if (!isValidSlug(slug)) return null;
-  const collections = deriveCollections(listSkillSlugs());
-  return readSkill(slug, collections.get(slug) ?? 'general');
+  return readSkill(slug, getPlacements());
 }
 
 export function toSummary(skill: Skill): SkillSummary {
-  const {slug, name, description, collection, tags, capabilities, files, totalBytes, updatedAt} = skill;
-  return {slug, name, description, collection, tags, capabilities, files, totalBytes, updatedAt};
+  const {slug, name, description, collection, source, tags, capabilities, files, totalBytes, updatedAt} = skill;
+  return {slug, name, description, collection, source, tags, capabilities, files, totalBytes, updatedAt};
 }
 
 /** Resolve a file inside a skill folder, refusing anything outside it. */

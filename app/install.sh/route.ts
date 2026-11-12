@@ -1,5 +1,7 @@
 import {INSTALL_TARGETS, DEFAULT_TARGET_ID} from '@/lib/targets';
 import {SITE_NAME, siteOrigin} from '@/lib/site';
+import {getBundles} from '@/lib/registry';
+import {isValidSlug} from '@/lib/skills';
 
 /**
  * Bash installer. Usage:
@@ -12,10 +14,15 @@ export async function GET(request: Request) {
     t => `    ${t.id}) GLOBAL_DIR="${t.globalDir}"; PROJECT_DIR="${t.projectDir}" ;;`,
   ).join('\n');
   const targetIds = INSTALL_TARGETS.map(t => t.id).join('|');
+  // Bundles are expanded inside the script, so --bundle needs no extra request. Ids and slugs are
+  // validated here because they are interpolated into shell source.
+  const bundles = getBundles().filter(b => isValidSlug(b.id) && b.skills.every(isValidSlug));
+  const bundleCases = bundles.map(b => `    ${b.id}) SKILLS+=(${b.skills.join(' ')}) ;;`).join('\n');
+  const bundleIds = bundles.map(b => b.id).join('|');
 
   const script = `#!/usr/bin/env bash
 # ${SITE_NAME} installer. Source of truth: ${origin}
-# Usage: curl -fsSL ${origin}/install.sh | bash -s -- <skill> [<skill>...] [--target ${targetIds}] [--project] [--dir <path>]
+# Usage: curl -fsSL ${origin}/install.sh | bash -s -- <skill> [<skill>...] [--bundle <id>] [--target ${targetIds}] [--project] [--dir <path>]
 set -euo pipefail
 
 BASE="\${NIKSYSKILLS_URL:-${origin}}"
@@ -27,8 +34,10 @@ SKILLS=()
 usage() {
   cat <<USAGE
 Usage: install.sh <skill> [<skill>...] [options]
+       install.sh --bundle <id> [options]
 
 Options:
+  --bundle <id>   Install every skill in a bundle: ${bundleIds || 'none defined'}
   --target <id>   Agent to install for: ${targetIds} (default: ${DEFAULT_TARGET_ID})
   --project       Install into the current project instead of your home directory
   --dir <path>    Install into an explicit directory (overrides --target/--project)
@@ -37,12 +46,22 @@ Options:
 
 Examples:
   curl -fsSL ${origin}/install.sh | bash -s -- git-commit-message
+  curl -fsSL ${origin}/install.sh | bash -s -- --bundle ${bundles[0]?.id ?? 'web-app'}
   curl -fsSL ${origin}/install.sh | bash -s -- session-handoff --target codex --project
 USAGE
 }
 
+add_bundle() {
+  case "$1" in
+${bundleCases}
+    *) echo "Unknown bundle: $1 (expected ${bundleIds || 'none defined'})" >&2; exit 2 ;;
+  esac
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --bundle) [[ $# -ge 2 ]] || { echo "--bundle needs an id" >&2; exit 2; }; add_bundle "$2"; shift 2 ;;
+    --bundle=*) add_bundle "\${1#*=}"; shift ;;
     --target) TARGET="$2"; shift 2 ;;
     --target=*) TARGET="\${1#*=}"; shift ;;
     --project) SCOPE="project"; shift ;;

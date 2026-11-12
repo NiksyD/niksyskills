@@ -1,7 +1,14 @@
 /**
  * Install targets: where each agent looks for skills on disk.
- * This is the single source of truth for the install bar and /install.sh.
- * Edit the paths here if an agent changes its convention.
+ * This is the single source of truth for the install bar, the builder and /install.sh.
+ *
+ * Checked against each vendor's docs on 2026-11-12:
+ * - Claude Code: ~/.claude/skills and .claude/skills
+ * - Codex: ~/.agents/skills and .agents/skills (docs: learn.chatgpt.com/docs/build-skills)
+ * - Cursor: ~/.cursor/skills and .cursor/skills (also reads .agents/skills)
+ * - Gemini CLI: ~/.gemini/skills and .gemini/skills (also reads .agents/skills)
+ * Skills are invoked by description match everywhere; the mention prefix is only a typing aid, and
+ * only Claude Code (/), Codex ($) and Cursor (/) document an explicit invocation syntax.
  */
 export interface InstallTarget {
   id: string;
@@ -25,8 +32,8 @@ export const INSTALL_TARGETS: InstallTarget[] = [
   {
     id: 'codex',
     label: 'Codex',
-    globalDir: '~/.codex/skills',
-    projectDir: '.codex/skills',
+    globalDir: '~/.agents/skills',
+    projectDir: '.agents/skills',
     mentionPrefix: '$',
   },
   {
@@ -34,7 +41,7 @@ export const INSTALL_TARGETS: InstallTarget[] = [
     label: 'Cursor',
     globalDir: '~/.cursor/skills',
     projectDir: '.cursor/skills',
-    mentionPrefix: '@',
+    mentionPrefix: '/',
   },
   {
     id: 'gemini',
@@ -62,13 +69,17 @@ export function mentionFor(slug: string, targetId: string): string {
   return `${getTarget(targetId).mentionPrefix}${slug}`;
 }
 
+/** One command that installs one or many skills. */
 export function installCommand(
   origin: string,
-  slug: string,
+  slugs: string | string[],
   targetId: string,
   isProject: boolean,
+  /** When the selection is exactly one bundle, pass its id for the short `--bundle` form. */
+  bundleId?: string,
 ): string {
+  const names = bundleId ? `--bundle ${bundleId}` : Array.isArray(slugs) ? slugs.join(' ') : slugs;
   const flags = [`--target ${targetId}`];
   if (isProject) flags.push('--project');
-  return `curl -fsSL ${origin}/install.sh | bash -s -- ${slug} ${flags.join(' ')}`;
+  return `curl -fsSL ${origin}/install.sh | bash -s -- ${names} ${flags.join(' ')}`;
 }

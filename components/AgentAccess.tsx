@@ -30,7 +30,24 @@ export function AgentAccess() {
           isWrapped
           code={`Install the "git-commit-message" skill from ${origin}. The index is at ${origin}/llms.txt and each skill can be installed with:\ncurl -fsSL ${origin}/install.sh | bash -s -- <skill-name>`}
         />
+        <VStack gap={2}>
+          <Text type="label">MCP server</Text>
+          <Text type="supporting" as="p">
+            Connect once and your agent can search, read and install skills as tools.
+          </Text>
+          <CodeBlock
+            title="Claude Code"
+            language="bash"
+            width="100%"
+            isWrapped
+            code={`claude mcp add --transport http niksyskills ${origin}/mcp`}
+          />
+        </VStack>
         <List density="compact" hasDividers edge="flush">
+          <ListItem
+            label={<Link href="/mcp">/mcp</Link>}
+            description="MCP endpoint (JSON-RPC over HTTP). Tools: list_skills, get_skill, install_skill."
+          />
           <ListItem
             label={<Link href="/llms.txt">/llms.txt</Link>}
             description="Plain-text index with install instructions, for LLM discovery."

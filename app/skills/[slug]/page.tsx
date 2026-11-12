@@ -1,4 +1,5 @@
 import type {Metadata} from 'next';
+import {Suspense} from 'react';
 import {notFound} from 'next/navigation';
 import {SkillDetail} from '@/components/SkillDetail';
 import {getSkill, listSkillSlugs} from '@/lib/skills';
@@ -20,9 +21,21 @@ export async function generateMetadata({params}: PageProps<'/skills/[slug]'>): P
   return {title: skill.name, description: skill.description};
 }
 
-export default async function SkillPage({params}: PageProps<'/skills/[slug]'>) {
+type Params = PageProps<'/skills/[slug]'>['params'];
+
+/** Reads the URL param, so it lives behind Suspense and keeps the shared App Shell URL-independent. */
+async function SkillContent({params}: {params: Params}) {
   const {slug} = await params;
   const skill = getSkill(slug);
   if (!skill) notFound();
   return <SkillDetail skill={skill} />;
+}
+
+export default function SkillPage({params}: PageProps<'/skills/[slug]'>) {
+  // No visual fallback: every real slug is prerendered, so the content resolves during the static render.
+  return (
+    <Suspense fallback={null}>
+      <SkillContent params={params} />
+    </Suspense>
+  );
 }
