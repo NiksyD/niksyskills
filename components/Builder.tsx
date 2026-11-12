@@ -116,6 +116,9 @@ export interface BundleInfo {
 export function Builder({skills, bundles}: {skills: SkillSummary[]; bundles: BundleInfo[]}) {
   const params = useSearchParams();
   const [treeExpanded, setTreeExpanded] = useState(false);
+  // Groups the user opened or closed by hand. Anything not listed opens on its own when it already
+  // holds a picked skill, so a selection is never hidden behind a closed row.
+  const [openOverride, setOpenOverride] = useState<Record<string, boolean>>({});
   const origin = useOrigin();
   const toast = useToast();
   const {copy} = useClipboard({announce: 'Copied'});
@@ -226,59 +229,63 @@ export function Builder({skills, bundles}: {skills: SkillSummary[]; bundles: Bun
           const pickedCount = slugs.filter(s => selectedSlugs.includes(s)).length;
           const allPicked = pickedCount === slugs.length;
           return (
-            <Collapsible
-              key={group.id}
-              // Big bundles start closed; their one-click button below still adds everything.
-              defaultIsOpen={slugs.length <= 8}
-              chevronPosition="start"
-              trigger={
-                <HStack gap={2} vAlign="center">
-                  <Text type="label">{collectionLabel(group.id)}</Text>
-                  <Text type="supporting" color="secondary">
-                    {pickedCount}/{slugs.length}
-                  </Text>
-                </HStack>
-              }>
-              <VStack gap={3}>
-                <Text type="supporting" color="secondary">
-                  {group.description}
-                </Text>
-                <HStack>
-                  <Button
-                    label={allPicked ? `Remove ${collectionLabel(group.id)}` : `Add all ${slugs.length}`}
-                    size="sm"
-                    variant="secondary"
-                    onClick={() =>
-                      allPicked ? setSelection(selectedSlugs.filter(s => !slugs.includes(s))) : addAll(slugs)
-                    }
-                  />
-                </HStack>
-                {group.members.map(skill => (
-                  <HStack key={skill.slug} gap={1} vAlign="start">
-                    <StackItem size="fill">
-                      <CheckboxInput
-                        label={skill.name}
-                        description={
-                          skill.description.length > 110
-                            ? `${skill.description.slice(0, 107)}...`
-                            : skill.description
-                        }
-                        value={selectedSlugs.includes(skill.slug)}
-                        onChange={on => toggle(skill.slug, on)}
-                      />
-                    </StackItem>
-                    <IconButton
-                      label={`Preview ${skill.name}`}
-                      tooltip="Preview"
-                      size="sm"
-                      variant={view?.skill.slug === skill.slug ? 'secondary' : 'ghost'}
-                      icon={<Icon icon={Eye} />}
-                      onClick={() => openFile(skill.slug, 'SKILL.md')}
-                    />
-                  </HStack>
-                ))}
-              </VStack>
-            </Collapsible>
+            <HStack key={group.id} gap={2} vAlign="start">
+              <StackItem size="fill">
+                <Collapsible
+                  isOpen={openOverride[group.id] ?? pickedCount > 0}
+                  onOpenChange={open => setOpenOverride(prev => ({...prev, [group.id]: open}))}
+                  chevronPosition="start"
+                  trigger={
+                    <HStack gap={2} vAlign="center">
+                      <Text type="label">{collectionLabel(group.id)}</Text>
+                      <Text type="supporting" color="secondary">
+                        {pickedCount}/{slugs.length}
+                      </Text>
+                    </HStack>
+                  }>
+                  <VStack gap={3}>
+                    <Text type="supporting" color="secondary">
+                      {group.description}
+                    </Text>
+                    {group.members.map(skill => (
+                      <HStack key={skill.slug} gap={1} vAlign="start">
+                        <StackItem size="fill">
+                          <CheckboxInput
+                            label={skill.name}
+                            description={
+                              skill.description.length > 110
+                                ? `${skill.description.slice(0, 107)}...`
+                                : skill.description
+                            }
+                            value={selectedSlugs.includes(skill.slug)}
+                            onChange={on => toggle(skill.slug, on)}
+                          />
+                        </StackItem>
+                        <IconButton
+                          label={`Preview ${skill.name}`}
+                          tooltip="Preview"
+                          size="sm"
+                          variant={view?.skill.slug === skill.slug ? 'secondary' : 'ghost'}
+                          icon={<Icon icon={Eye} />}
+                          onClick={() => openFile(skill.slug, 'SKILL.md')}
+                        />
+                      </HStack>
+                    ))}
+                  </VStack>
+                </Collapsible>
+              </StackItem>
+              {/* Beside the trigger, not inside it, so one click adds a bundle without opening it. */}
+              <div style={{flexShrink: 0}}>
+                <Button
+                  label={allPicked ? 'Remove' : 'Add all'}
+                  size="sm"
+                  variant={allPicked ? 'ghost' : 'secondary'}
+                  onClick={() =>
+                    allPicked ? setSelection(selectedSlugs.filter(s => !slugs.includes(s))) : addAll(slugs)
+                  }
+                />
+              </div>
+            </HStack>
           );
         })}
       </VStack>

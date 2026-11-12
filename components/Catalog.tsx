@@ -5,7 +5,7 @@ import {Layout, LayoutContent, LayoutHeader} from '@astryxdesign/core/Layout';
 import {Heading} from '@astryxdesign/core/Heading';
 import {Text} from '@astryxdesign/core/Text';
 import {TextInput} from '@astryxdesign/core/TextInput';
-import {SegmentedControl, SegmentedControlItem} from '@astryxdesign/core/SegmentedControl';
+import {Selector} from '@astryxdesign/core/Selector';
 import {Grid} from '@astryxdesign/core/Grid';
 import {ClickableCard} from '@astryxdesign/core/ClickableCard';
 import {VStack} from '@astryxdesign/core/VStack';
@@ -27,10 +27,17 @@ export function Catalog({skills}: {skills: SkillSummary[]}) {
   const [collection, setCollection] = useState('all');
   const deferredQuery = useDeferredValue(query);
 
-  const collections = useMemo(
-    () => Array.from(new Set(skills.map(s => s.collection))).sort(),
-    [skills],
-  );
+  // One option per bundle with its skill count, so the filter stays usable as bundles are added.
+  const collectionOptions = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const s of skills) counts.set(s.collection, (counts.get(s.collection) ?? 0) + 1);
+    return [
+      {value: 'all', label: `All skills (${skills.length})`},
+      ...Array.from(counts.keys())
+        .sort((a, b) => collectionLabel(a).localeCompare(collectionLabel(b)))
+        .map(c => ({value: c, label: `${collectionLabel(c)} (${counts.get(c)})`})),
+    ];
+  }, [skills]);
 
   const visible = useMemo(() => {
     const q = deferredQuery.trim().toLowerCase();
@@ -81,13 +88,19 @@ export function Catalog({skills}: {skills: SkillSummary[]}) {
                     width="100%"
                   />
                 </StackItem>
-                {collections.length > 1 ? (
-                  <SegmentedControl label="Collection" value={collection} onChange={setCollection}>
-                    <SegmentedControlItem value="all" label="All" />
-                    {collections.map(c => (
-                      <SegmentedControlItem key={c} value={c} label={collectionLabel(c)} />
-                    ))}
-                  </SegmentedControl>
+                {collectionOptions.length > 2 ? (
+                  <Selector
+                    label="Bundle"
+                    isLabelHidden
+                    startIcon="filter"
+                    options={collectionOptions}
+                    value={collection}
+                    onChange={setCollection}
+                    hasSearch
+                    searchPlaceholder="Find a bundle"
+                    presentation="adaptive"
+                    width={240}
+                  />
                 ) : null}
               </HStack>
 
