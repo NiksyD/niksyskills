@@ -41,4 +41,25 @@ Also imported 2026-11-12 from the **aasb-aas-secure-app-builder** bundle of the 
 frontend-security-coder, backend-security-coder, secrets-management, dependency-management-deps-audit,
 threat-modeling-expert, cc-skill-security-review.
 
+Also imported 2026-11-12 from the **aasb-aas-qa-test-automation** bundle of the same repository
+(`plugins/aasb-aas-qa-test-automation/skills/`), unmodified and under the same licenses:
+e2e-testing-patterns, testing-patterns, test-fixing, code-review-checklist, ci-cd-and-automation.
+Exception: `ci-cd-and-automation` originates from https://github.com/addyosmani/agent-skills
+(MIT, Copyright (c) 2025 Addy Osmani), see `THIRD_PARTY_LICENSE-addyosmani-agent-skills.txt`.
+
+Also imported 2026-11-12 from the **aasb-architecture-design** bundle of the same repository
+(`plugins/aasb-architecture-design/skills/`), unmodified and under the same licenses:
+architecture-decision-records, architecture-patterns, microservices-patterns, senior-architect.
+The identical skills are also published as `plugins/agentic-bundle-architecture-design`.
+
+Also imported 2026-11-12 from the **aasb-aas-devops-cloud** bundle of the same repository
+(`plugins/aasb-aas-devops-cloud/skills/`), unmodified and under the same licenses:
+deployment-procedures, docker-expert, github-actions-templates, environment-setup-guide, bash-linux.
+
+Also imported 2026-11-12 from the **aasb-aas-observability-ir** bundle of the same repository
+(`plugins/aasb-aas-observability-ir/skills/`), unmodified and under the same licenses:
+observability-and-instrumentation, performance-engineer, postmortem-writing.
+Exception: `observability-and-instrumentation` originates from https://github.com/addyosmani/agent-skills
+(MIT, Copyright (c) 2025 Addy Osmani), see `THIRD_PARTY_LICENSE-addyosmani-agent-skills.txt`.
+
 The remaining skills (`git-commit-message`, `session-handoff`, `prospect-standards-*`) are original.

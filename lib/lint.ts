@@ -130,9 +130,10 @@ export function lintSkill(text: string, expectedSlug?: string): LintReport {
     add('absolute-path', 'warning', 'Contains an absolute personal path. Use paths relative to the project.');
   }
   // An api key assignment only counts when the value is a literal (quoted, or one long bare token), so
-  // `apiKey = process.env.X` in a "do this instead" example is not flagged.
+  // `apiKey = process.env.X` in a "do this instead" example is not flagged. Obvious placeholders such as
+  // `API_KEY=your-api-key-here` in a .env template are skipped too.
   if (
-    /(sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{30,}|AKIA[0-9A-Z]{16}|api[_-]?key\s*[:=]\s*(["'][^"'\s]{12,}["']|[A-Za-z0-9_-]{16,}(?![\w.(\[])))/i.test(
+    /(sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{30,}|AKIA[0-9A-Z]{16}|api[_-]?key\s*[:=]\s*(?!["']?(?:your(?![a-z0-9])|(?:x{3,}|change[-_]?me|example|placeholder|dummy)\b)|["']?<)(["'][^"'\s]{12,}["']|[A-Za-z0-9_-]{16,}(?![\w.(\[])))/i.test(
       text,
     )
   ) {

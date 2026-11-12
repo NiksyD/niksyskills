@@ -1,6 +1,63 @@
 {
   "bundles": [
     {
+      "id": "observability",
+      "description": "Seeing what your code does in production: instrumentation, performance diagnosis and blameless postmortems.",
+      "source": {
+        "name": "agentic-awesome-skills (aasb-aas-observability-ir)",
+        "url": "https://github.com/sickn33/agentic-awesome-skills/tree/main/plugins/aasb-aas-observability-ir",
+        "license": "MIT / CC BY 4.0"
+      },
+      "skills": ["observability-and-instrumentation", "performance-engineer", "postmortem-writing"]
+    },
+    {
+      "id": "devops",
+      "description": "Shipping what you build: deployment procedures and rollbacks, Docker, GitHub Actions workflows, dev environment setup and shell scripting.",
+      "source": {
+        "name": "agentic-awesome-skills (aasb-aas-devops-cloud)",
+        "url": "https://github.com/sickn33/agentic-awesome-skills/tree/main/plugins/aasb-aas-devops-cloud",
+        "license": "MIT / CC BY 4.0"
+      },
+      "skills": [
+        "deployment-procedures",
+        "docker-expert",
+        "github-actions-templates",
+        "environment-setup-guide",
+        "bash-linux"
+      ]
+    },
+    {
+      "id": "architecture",
+      "description": "System design: architecture decision records, clean and hexagonal architecture, microservices patterns and architecture reviews.",
+      "source": {
+        "name": "agentic-awesome-skills (aasb-architecture-design)",
+        "url": "https://github.com/sickn33/agentic-awesome-skills/tree/main/plugins/aasb-architecture-design",
+        "license": "MIT / CC BY 4.0"
+      },
+      "skills": [
+        "architecture-decision-records",
+        "architecture-patterns",
+        "microservices-patterns",
+        "senior-architect"
+      ]
+    },
+    {
+      "id": "qa-testing",
+      "description": "Testing and quality: end-to-end and unit test patterns, fixing failing tests, code review checklists and CI/CD setup.",
+      "source": {
+        "name": "agentic-awesome-skills (aasb-aas-qa-test-automation)",
+        "url": "https://github.com/sickn33/agentic-awesome-skills/tree/main/plugins/aasb-aas-qa-test-automation",
+        "license": "MIT / CC BY 4.0"
+      },
+      "skills": [
+        "e2e-testing-patterns",
+        "testing-patterns",
+        "test-fixing",
+        "code-review-checklist",
+        "ci-cd-and-automation"
+      ]
+    },
+    {
       "id": "secure-app",
       "description": "Building securely: frontend and backend secure coding, secrets handling, dependency audits, threat modeling and security review.",
       "source": {
