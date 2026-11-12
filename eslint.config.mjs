@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Skills are content (some imported unmodified), not app code.
+    "skills/**",
   ]),
 ]);
 

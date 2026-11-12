@@ -1,6 +1,52 @@
 {
   "bundles": [
     {
+      "id": "secure-app",
+      "description": "Building securely: frontend and backend secure coding, secrets handling, dependency audits, threat modeling and security review.",
+      "source": {
+        "name": "agentic-awesome-skills (aasb-aas-secure-app-builder)",
+        "url": "https://github.com/sickn33/agentic-awesome-skills/tree/main/plugins/aasb-aas-secure-app-builder",
+        "license": "MIT / CC BY 4.0"
+      },
+      "skills": [
+        "frontend-security-coder",
+        "backend-security-coder",
+        "secrets-management",
+        "dependency-management-deps-audit",
+        "threat-modeling-expert",
+        "cc-skill-security-review"
+      ]
+    },
+    {
+      "id": "api-backend",
+      "description": "Designing and securing back-end APIs: REST and GraphQL design, auth, database schemas, OpenAPI specs, contract tests, rate limits and safe deprecation.",
+      "source": {
+        "name": "agentic-awesome-skills (aasb-aas-api-platform-builder)",
+        "url": "https://github.com/sickn33/agentic-awesome-skills/tree/main/plugins/aasb-aas-api-platform-builder",
+        "license": "MIT / CC BY 4.0"
+      },
+      "skills": [
+        "api-design-principles",
+        "api-security-best-practices",
+        "auth-implementation-patterns",
+        "database-design",
+        "openapi-spec-generation",
+        "api-contract-testing",
+        "api-rate-limit-handler",
+        "deprecation-and-migration"
+      ]
+    },
+    {
+      "id": "essentials",
+      "description": "Core engineering habits: plan before coding, debug from the root cause, test first, and run lint and type checks.",
+      "source": {
+        "name": "agentic-awesome-skills (aasb-essentials)",
+        "url": "https://github.com/sickn33/agentic-awesome-skills/tree/main/plugins/aasb-essentials",
+        "license": "MIT / CC BY 4.0"
+      },
+      "skills": ["concise-planning", "systematic-debugging", "test-driven-development", "lint-and-validate"]
+    },
+    {
       "id": "workflow",
       "description": "Everyday habits: commit messages and carrying context between chats.",
       "skills": ["git-commit-message", "session-handoff"]

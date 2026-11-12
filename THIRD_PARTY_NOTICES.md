@@ -24,4 +24,21 @@ frontend-api-integration-patterns, frontend-design, frontend-developer, javascri
 nextjs-app-router-patterns, nextjs-best-practices, nodejs-best-practices, react-best-practices,
 react-patterns, seo-audit, shadcn, tailwind-patterns, typescript-expert, ui-a11y, ui-states.
 
+Also imported 2026-11-12 from the **aasb-essentials** bundle of the same repository
+(`plugins/aasb-essentials/skills/`), unmodified and under the same licenses: concise-planning,
+systematic-debugging, test-driven-development, lint-and-validate. The bundle's `git-pushing` skill
+was deliberately left out.
+
+Also imported 2026-11-12 from the **aasb-aas-api-platform-builder** bundle of the same repository
+(`plugins/aasb-aas-api-platform-builder/skills/`), unmodified and under the same licenses:
+api-design-principles, api-security-best-practices, auth-implementation-patterns, database-design,
+openapi-spec-generation, api-contract-testing, api-rate-limit-handler, deprecation-and-migration.
+Exception: `deprecation-and-migration` originates from https://github.com/addyosmani/agent-skills
+(MIT, Copyright (c) 2025 Addy Osmani), see `THIRD_PARTY_LICENSE-addyosmani-agent-skills.txt`.
+
+Also imported 2026-11-12 from the **aasb-aas-secure-app-builder** bundle of the same repository
+(`plugins/aasb-aas-secure-app-builder/skills/`), unmodified and under the same licenses:
+frontend-security-coder, backend-security-coder, secrets-management, dependency-management-deps-audit,
+threat-modeling-expert, cc-skill-security-review.
+
 The remaining skills (`git-commit-message`, `session-handoff`, `prospect-standards-*`) are original.

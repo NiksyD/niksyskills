@@ -129,7 +129,13 @@ export function lintSkill(text: string, expectedSlug?: string): LintReport {
   if (/(\/home\/[a-z0-9_-]+|\/Users\/[A-Za-z0-9_-]+|C:\\Users\\)/.test(text)) {
     add('absolute-path', 'warning', 'Contains an absolute personal path. Use paths relative to the project.');
   }
-  if (/(sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{30,}|AKIA[0-9A-Z]{16}|api[_-]?key\s*[:=]\s*\S{12,})/i.test(text)) {
+  // An api key assignment only counts when the value is a literal (quoted, or one long bare token), so
+  // `apiKey = process.env.X` in a "do this instead" example is not flagged.
+  if (
+    /(sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{30,}|AKIA[0-9A-Z]{16}|api[_-]?key\s*[:=]\s*(["'][^"'\s]{12,}["']|[A-Za-z0-9_-]{16,}(?![\w.(\[])))/i.test(
+      text,
+    )
+  ) {
     add('secret', 'error', 'Looks like it contains a credential. Remove it before publishing.');
   }
 
